@@ -2,5 +2,8 @@ Based on matrixgl 1.0 (http://knoppix.ru/matrixgl.shtml) by:
   * Alexander Zolotov  <nightradio@gmail.com> 2003.
   * Eugene Zolotov     <sentinel@knoppix.ru> 2003.
 
-This version by:
+Old MacOS version based on OpenGL by:
   * Vincent Launchbury <vincent@doublecreations.com> 2008-2014
+
+New MacOS version based on Metal by:
+  * Philipp Schuler <schuler.philipp@gmai.com> 2026
