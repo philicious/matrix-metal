@@ -23,7 +23,7 @@ int main(int argc, const char *argv[]) {
                                                         styleMask:(NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable | NSWindowStyleMaskResizable)
                                                           backing:NSBackingStoreBuffered
                                                             defer:NO];
-        [window setTitle:@"matrixgl-metal"];
+        [window setTitle:@"matrix-metal"];
 
         id<MTLDevice> device = MTLCreateSystemDefaultDevice();
         MatrixRenderer *renderer = [[MatrixRenderer alloc] initWithDevice:device];
