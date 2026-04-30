@@ -1,5 +1,5 @@
 APP=matrix-metal
-SRC=MatrixMetal.mm
+SRC=MatrixMetal.mm MatrixRenderer.mm
 
 all:
 	clang++ -std=c++17 -fobjc-arc -O2 $(SRC) -o $(APP) \
