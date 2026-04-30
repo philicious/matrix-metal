@@ -31,3 +31,11 @@ Copy the `MatrixMetal.saver` to `~/Library/Screen Savers` or run
 > make install-saver
 
 Note: Before re-installing, run make reset-screensaver to get rid of older cached versions
+
+### Donate
+
+If you like this screensaver, you can
+
+<a href='https://ko-fi.com/C1C31YPQBW' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi5.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+
+I dont take credit for the original artwork but for porting the source to MacOS Metal framework, which took some hours, despite using AI.
