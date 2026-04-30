@@ -64,6 +64,7 @@ static inline int clampi(int x, int low, int high) {
     int _updateTick;
 }
 
+// Converts a glyph index in the 10x6 atlas into normalized UV bounds.
 - (void)glyphUVForNum:(uint8_t)num u0:(float *)u0 v0:(float *)v0 u1:(float *)u1 v1:(float *)v1 {
     const float cols = 10.0f;
     const float rows = 6.0f;
@@ -89,6 +90,7 @@ static inline int clampi(int x, int low, int high) {
     return [self initWithDevice:nil];
 }
 
+// Initializes rendering state, simulation defaults, GPU pipeline, and textures.
 - (instancetype)initWithDevice:(id<MTLDevice>)device {
     self = [super init];
     if (!self) return nil;
@@ -111,6 +113,7 @@ static inline int clampi(int x, int low, int high) {
     return self;
 }
 
+// Builds inline Metal shaders, additive blending pipeline, and samplers.
 - (void)setupPipeline {
     NSError *error = nil;
     NSString *src = @"using namespace metal;"
@@ -172,6 +175,7 @@ static inline int clampi(int x, int low, int high) {
     _flareSampler = [_device newSamplerStateWithDescriptor:flareSD];
 }
 
+// Recomputes rain grid dimensions and resets glyph/speed simulation buffers.
 - (void)setupStateForSize:(int)w height:(int)h {
     if (w <= 0 || h <= 0) return;
 
@@ -195,6 +199,7 @@ static inline int clampi(int x, int low, int high) {
     _picOffset = (kRTextX * kTextY) * (rand() % kNumPics);
 }
 
+// Uploads an 8-bit luminance buffer into an R8 Metal texture.
 - (id<MTLTexture>)makeTextureW:(int)w h:(int)h bytes:(const uint8_t *)bytes {
     MTLTextureDescriptor *d = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatR8Unorm width:w height:h mipmapped:NO];
     id<MTLTexture> tex = [_device newTextureWithDescriptor:d];
@@ -202,6 +207,7 @@ static inline int clampi(int x, int low, int high) {
     return tex;
 }
 
+// Prepares atlas and flare textures used by glyph and glow passes.
 - (void)setupTextures {
     std::vector<uint8_t> fontGreen(512 * 256);
     for (int i = 0; i < 512 * 256; i++) {
@@ -219,6 +225,7 @@ static inline int clampi(int x, int low, int high) {
     _flareTex = [self makeTextureW:4 h:4 bytes:flare];
 }
 
+// Advances the simulation to avoid a cold-start visual jump.
 - (void)warmup {
     for (int i = 0; i < 500; i++) {
         [self makeChange];
@@ -226,6 +233,7 @@ static inline int clampi(int x, int low, int high) {
     }
 }
 
+// Applies per-frame random glyph mutations and occasional bright head spawns.
 - (void)makeChange {
     for (int i = 0; i < _rainIntensity; i++) {
         int r = rand() % (_textX * kTextY);
@@ -236,6 +244,7 @@ static inline int clampi(int x, int low, int high) {
     }
 }
 
+// Scrolls stream alpha state down columns and updates image fade transitions.
 - (void)scrollState {
     static bool odd = false;
     odd = !odd;
@@ -278,6 +287,7 @@ static inline int clampi(int x, int low, int high) {
     }
 }
 
+// Projects a world-space quad to clip space and appends two triangles.
 - (void)addQuadX0:(float)x0 y0:(float)y0 x1:(float)x1 y1:(float)y1 z:(float)z
                u0:(float)u0 v0:(float)v0 u1:(float)u1 v1:(float)v1
                r:(float)r g:(float)g b:(float)b a:(float)a
@@ -310,6 +320,7 @@ static inline int clampi(int x, int low, int high) {
     _verts.push_back(v3a);
 }
 
+// Builds base rain geometry with depth-aware dimming for picture regions.
 - (void)buildPass1WithWidth:(float)w height:(float)h {
     int b = 0;
     int i = 0;
@@ -337,6 +348,7 @@ static inline int clampi(int x, int low, int high) {
     }
 }
 
+// Builds highlight geometry for stream heads: glyph core (mode 0) and glow (mode 1).
 - (void)buildPass2WithMode:(int)mode width:(float)w height:(float)h {
     std::vector<int> chosenRows(_textX, -1);
 
@@ -387,6 +399,7 @@ static inline int clampi(int x, int low, int high) {
     }
 }
 
+// Advances simulation ticks and records all render passes for the current frame.
 - (void)drawInMTKView:(MTKView *)view {
     if (view.drawableSize.width < 1.0 || view.drawableSize.height < 1.0) return;
 
@@ -450,23 +463,28 @@ static inline int clampi(int x, int low, int high) {
     [cb commit];
 }
 
+// Reinitializes simulation buffers when drawable size changes.
 - (void)mtkView:(MTKView *)view drawableSizeWillChange:(CGSize)size {
     (void)view;
     [self setupStateForSize:(int)size.width height:(int)size.height];
 }
 
+// Toggles classic mode by enabling or disabling depth-image transitions.
 - (void)setImagesEnabled:(BOOL)enabled {
     _classic = !enabled;
     if (_classic) _picFade = 0;
 }
 
+// Runtime toggle between classic rain and image-overlay mode.
 - (void)toggleClassic {
     _classic = !_classic;
     if (_classic) _picFade = 0;
 }
 
+// Pauses or resumes simulation updates while preserving render output.
 - (void)togglePause { _paused = !_paused; }
 
+// Advances to the next depth image in non-classic mode.
 - (void)nextPicture {
     if (_classic || _paused) return;
     _picOffset += kRTextX * kTextY;
