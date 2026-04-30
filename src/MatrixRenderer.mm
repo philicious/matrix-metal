@@ -62,12 +62,6 @@ static inline int clampi(int x, int low, int high) {
     int _rainIntensity;
     int _updateDivider;
     int _updateTick;
-    NSUInteger _debugDrawCount;
-    NSUInteger _debugNoDrawableCount;
-}
-
-+ (void)load {
-    NSLog(@"[MatrixRenderer] class loaded");
 }
 
 - (void)glyphUVForNum:(uint8_t)num u0:(float *)u0 v0:(float *)v0 u1:(float *)u1 v1:(float *)v1 {
@@ -109,8 +103,6 @@ static inline int clampi(int x, int low, int high) {
     _rainIntensity = 1;
     _updateDivider = 2;
     _updateTick = 0;
-    _debugDrawCount = 0;
-    _debugNoDrawableCount = 0;
 
     [self setupPipeline];
     [self setupStateForSize:1280 height:800];
@@ -409,18 +401,7 @@ static inline int clampi(int x, int low, int high) {
 
     id<CAMetalDrawable> drawable = view.currentDrawable;
     MTLRenderPassDescriptor *rpd = view.currentRenderPassDescriptor;
-    if (!drawable || !rpd) {
-        _debugNoDrawableCount++;
-        if ((_debugNoDrawableCount % 120) == 0) {
-            NSLog(@"[MatrixRenderer] waiting drawable size=%.0fx%.0f", view.drawableSize.width, view.drawableSize.height);
-        }
-        return;
-    }
-
-    _debugDrawCount++;
-    if ((_debugDrawCount % 120) == 0) {
-        NSLog(@"[MatrixRenderer] drawing size=%.0fx%.0f", view.drawableSize.width, view.drawableSize.height);
-    }
+    if (!drawable || !rpd) return;
 
     id<MTLCommandBuffer> cb = [_queue commandBuffer];
     id<MTLRenderCommandEncoder> enc = [cb renderCommandEncoderWithDescriptor:rpd];
